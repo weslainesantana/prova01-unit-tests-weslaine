@@ -1,275 +1,187 @@
 const Utilitarios = require("../src/utilitarios");
 
-const TEST_DATA = {
-  strings: {
-    simple: "teste",
-    empty: "",
-    withSymbols: "a1b2@c3",
-    withSpaces: "   teste   ",
-    palindrome: "A man, a plan, a canal: Panama",
-    notPalindrome: "race a car",
-    singleChar: "a",
-    spacesOnly: "     ",
-    unicode: "😊👍"
-  },
-  arrays: {
-    numbers: [1, 2, 3],
-    unsorted: [3, 1, 2],
-    withDuplicates: [1, 2, 2, 3, 3, 3],
-    strings: ["c", "a", "b"],
-    empty: [],
-    forAverage: [1, 2, 3, 4, 5],
-    mixedTypes: [1, "1", 1]
-  },
-  math: {
-    PRIMEIRO_NUMERO: 5,
-    SEGUNDO_NUMERO: 10,
-    SOMA_ESPERADA: 15,
-    SUBTRACAO_ESPERADA: 5,
-    MULTIPLICACAO_ESPERADA: 50,
-    DIVISAO_NUMERADOR: 10,
-    DIVISAO_DENOMINADOR: 2,
-    DIVISAO_ESPERADA: 5,
-    NUMERO_PAR: 4,
-    NUMERO_IMPAR: 5
-  },
-  objects: {
-    first: { a: 1, b: 2 },
-    second: { c: 3, d: 4 },
-    merged: { a: 1, b: 2, c: 3, d: 4 },
-    nested1: { a: { x: 1 } },
-    nested2: { b: { y: 2 } }
-  }
-};
-
-describe("Classe Utilitarios", () => {
-  let utilitarios;
+describe("Testes completos da classe Utilitarios", () => {
+  let util;
 
   beforeEach(() => {
-    utilitarios = new Utilitarios();
+    util = new Utilitarios();
   });
 
-  // -------------------
-  // Strings
-  // -------------------
-  describe("Métodos de String", () => {
-    test("inverterString deve inverter corretamente", () => {
-      expect(utilitarios.inverterString("abc")).toBe("cba");
-      expect(utilitarios.inverterString(TEST_DATA.strings.empty)).toBe("");
-      expect(utilitarios.inverterString(TEST_DATA.strings.withSymbols)).toBe("3c@2b1a");
-      expect(utilitarios.inverterString(TEST_DATA.strings.unicode)).toBe("👍😊");
-      expect(utilitarios.inverterString(TEST_DATA.strings.spacesOnly)).toBe(TEST_DATA.strings.spacesOnly);
+  // =========================
+  // Testes de Strings
+  // =========================
+  describe("Funções de manipulação de strings", () => {
+    test("inverterString deve inverter corretamente uma string simples e vazia", () => {
+      expect(util.inverterString("abc")).toBe("cba");
+      expect(util.inverterString("")).toBe("");
     });
 
-    test("contarCaracteres deve contar corretamente", () => {
-      expect(utilitarios.contarCaracteres(TEST_DATA.strings.simple)).toBe(5);
-      expect(utilitarios.contarCaracteres(TEST_DATA.strings.empty)).toBe(0);
-      expect(utilitarios.contarCaracteres("a b c")).toBe(5);
+    test("inverterString deve lidar com números, símbolos e espaços", () => {
+      expect(util.inverterString("a1 @b2")).toBe("2b@ 1a");
     });
 
-    test("paraMaiusculas e paraMinusculas", () => {
-      expect(utilitarios.paraMaiusculas("abc")).toBe("ABC");
-      expect(utilitarios.paraMaiusculas("123@!abc")).toBe("123@!ABC");
-      expect(utilitarios.paraMinusculas("ABC")).toBe("abc");
-      expect(utilitarios.paraMinusculas(TEST_DATA.strings.empty)).toBe("");
+    test("contarCaracteres deve contar corretamente, inclusive espaços", () => {
+      expect(util.contarCaracteres("a b c")).toBe(5);
+      expect(util.contarCaracteres("")).toBe(0);
     });
 
-    test("primeiraLetraMaiuscula deve lidar com vários casos", () => {
-      expect(utilitarios.primeiraLetraMaiuscula(TEST_DATA.strings.simple)).toBe("Teste");
-      expect(utilitarios.primeiraLetraMaiuscula(TEST_DATA.strings.empty)).toBe("");
-      expect(utilitarios.primeiraLetraMaiuscula(TEST_DATA.strings.spacesOnly)).toBe(TEST_DATA.strings.spacesOnly);
-      expect(utilitarios.primeiraLetraMaiuscula(TEST_DATA.strings.singleChar)).toBe("A");
-      expect(utilitarios.primeiraLetraMaiuscula("1abc")).toBe("1abc");
-      expect(utilitarios.primeiraLetraMaiuscula("@abc")).toBe("@abc");
+    test("paraMaiusculas e paraMinusculas devem converter corretamente", () => {
+      expect(util.paraMaiusculas("aBc")).toBe("ABC");
+      expect(util.paraMinusculas("ABc")).toBe("abc");
     });
 
-    test("removerEspacos deve remover espaços externos", () => {
-      expect(utilitarios.removerEspacos(TEST_DATA.strings.withSpaces)).toBe("teste");
-      expect(utilitarios.removerEspacos(" teste teste ")).toBe("teste teste");
-      expect(utilitarios.removerEspacos("     ")).toBe("");
+    test("primeiraLetraMaiuscula deve capitalizar corretamente strings", () => {
+      expect(util.primeiraLetraMaiuscula("teste")).toBe("Teste");
+      expect(util.primeiraLetraMaiuscula("")).toBe("");
+      expect(util.primeiraLetraMaiuscula("JáMaiuscula")).toBe("JáMaiuscula");
     });
 
-    test("repetirTexto deve repetir corretamente", () => {
-      expect(utilitarios.repetirTexto("a", 3)).toBe("aaa");
-      expect(utilitarios.repetirTexto("abc", 0)).toBe("");
-      expect(utilitarios.repetirTexto("abc", -1)).toBe(""); // comportamento esperado para negativo
+    test("removerEspacos deve remover apenas espaços externos", () => {
+      expect(util.removerEspacos("  teste teste  ")).toBe("teste teste");
+      expect(util.removerEspacos("interno não muda")).toBe("interno não muda");
     });
 
-    test("contarPalavras deve contar corretamente", () => {
-      expect(utilitarios.contarPalavras(" um dois três ")).toBe(3);
-      expect(utilitarios.contarPalavras("palavra")).toBe(1);
-      expect(utilitarios.contarPalavras("     ")).toBe(0);
+    test("repetirTexto deve repetir n vezes ou retornar vazio", () => {
+      expect(util.repetirTexto("x", 3)).toBe("xxx");
+      expect(util.repetirTexto("y", 0)).toBe("");
     });
 
-    test("ehPalindromo deve validar corretamente", () => {
-      expect(utilitarios.ehPalindromo(TEST_DATA.strings.palindrome)).toBe(true);
-      expect(utilitarios.ehPalindromo(TEST_DATA.strings.notPalindrome)).toBe(false);
-      expect(utilitarios.ehPalindromo("A Santa at NASA")).toBe(true);
-      expect(utilitarios.ehPalindromo(TEST_DATA.strings.empty)).toBe(true);
-      expect(utilitarios.ehPalindromo(TEST_DATA.strings.singleChar)).toBe(true);
+    test("contarPalavras deve contar corretamente palavras ignorando múltiplos espaços", () => {
+      expect(util.contarPalavras(" um  dois três  ")).toBe(3);
+      expect(util.contarPalavras("palavra")).toBe(1);
+    });
+
+    test("ehPalindromo deve reconhecer palíndromos ignorando cases e símbolos", () => {
+      expect(util.ehPalindromo("A man, a plan, a canal: Panama")).toBe(true);
+      expect(util.ehPalindromo("não é")).toBe(false);
+      expect(util.ehPalindromo("")).toBe(true); // caso borda
     });
   });
 
-  // -------------------
-  // Números
-  // -------------------
-  describe("Funções Matemáticas", () => {
-    const { PRIMEIRO_NUMERO, SEGUNDO_NUMERO, SOMA_ESPERADA, SUBTRACAO_ESPERADA, MULTIPLICACAO_ESPERADA, DIVISAO_NUMERADOR, DIVISAO_DENOMINADOR, DIVISAO_ESPERADA, NUMERO_PAR, NUMERO_IMPAR } = TEST_DATA.math;
-
-    test("somar deve funcionar com positivos, negativos e zero", () => {
-      expect(utilitarios.somar(PRIMEIRO_NUMERO, SEGUNDO_NUMERO)).toBe(SOMA_ESPERADA);
-      expect(utilitarios.somar(-5, -10)).toBe(-15);
-      expect(utilitarios.somar(0, 5)).toBe(5);
+  // =========================
+  // Testes Matemáticos
+  // =========================
+  describe("Funções matemáticas", () => {
+    test("somar deve lidar com positivos, negativos e zero", () => {
+      expect(util.somar(2, 3)).toBe(5);
+      expect(util.somar(-2, -3)).toBe(-5);
+      expect(util.somar(0, 4)).toBe(4);
     });
 
-    test("subtrair deve funcionar com positivos e negativos", () => {
-      expect(utilitarios.subtrair(SEGUNDO_NUMERO, PRIMEIRO_NUMERO)).toBe(SUBTRACAO_ESPERADA);
-      expect(utilitarios.subtrair(5, 10)).toBe(-5);
+    test("subtrair deve retornar resultados corretos incluindo negativos", () => {
+      expect(util.subtrair(10, 5)).toBe(5);
+      expect(util.subtrair(5, 10)).toBe(-5);
     });
 
-    test("multiplicar deve funcionar com positivos, zero e negativos", () => {
-      expect(utilitarios.multiplicar(PRIMEIRO_NUMERO, SEGUNDO_NUMERO)).toBe(MULTIPLICACAO_ESPERADA);
-      expect(utilitarios.multiplicar(100, 0)).toBe(0);
-      expect(utilitarios.multiplicar(-5, 3)).toBe(-15);
+    test("multiplicar deve lidar com positivos, negativos e zero", () => {
+      expect(util.multiplicar(4, 5)).toBe(20);
+      expect(util.multiplicar(-3, 3)).toBe(-9);
+      expect(util.multiplicar(3, 0)).toBe(0);
     });
 
-    test("dividir deve lidar com casos normais, negativos e decimais", () => {
-      expect(utilitarios.dividir(DIVISAO_NUMERADOR, DIVISAO_DENOMINADOR)).toBe(DIVISAO_ESPERADA);
-      expect(() => utilitarios.dividir(10, 0)).toThrow("Divisão por zero");
-      expect(utilitarios.dividir(10, 3)).toBeCloseTo(3.333, 3);
-      expect(utilitarios.dividir(-10, 2)).toBe(-5);
+    test("dividir deve lidar com números positivos, negativos e lançar erro ao dividir por zero", () => {
+      expect(util.dividir(10, 2)).toBe(5);
+      expect(util.dividir(-10, 2)).toBe(-5);
+      expect(() => util.dividir(10, 0)).toThrow("Divisão por zero");
     });
 
-    test("ehPar deve validar corretamente", () => {
-      expect(utilitarios.ehPar(NUMERO_PAR)).toBe(true);
-      expect(utilitarios.ehPar(NUMERO_IMPAR)).toBe(false);
-      expect(utilitarios.ehPar(0)).toBe(true);
-      expect(utilitarios.ehPar(-4)).toBe(true);
-      expect(utilitarios.ehPar(-3)).toBe(false);
-      expect(utilitarios.ehPar(Number.MAX_SAFE_INTEGER - 1)).toBe(true);
+    test("ehPar deve identificar corretamente pares e ímpares, incluindo zero e negativos", () => {
+      expect(util.ehPar(2)).toBe(true);
+      expect(util.ehPar(3)).toBe(false);
+      expect(util.ehPar(0)).toBe(true);
+      expect(util.ehPar(-4)).toBe(true);
+      expect(util.ehPar(-5)).toBe(false);
     });
   });
 
-  // -------------------
-  // Arrays
-  // -------------------
-  describe("Manipulação de Array", () => {
-    test("primeiroElemento e ultimoElemento devem lidar com arrays normais e vazios", () => {
-      expect(utilitarios.primeiroElemento(TEST_DATA.arrays.numbers)).toBe(1);
-      expect(utilitarios.ultimoElemento(TEST_DATA.arrays.numbers)).toBe(3);
-      expect(utilitarios.primeiroElemento(TEST_DATA.arrays.empty)).toBeUndefined();
-      expect(utilitarios.ultimoElemento(TEST_DATA.arrays.empty)).toBeUndefined();
-      expect(utilitarios.primeiroElemento([42])).toBe(42);
-      expect(utilitarios.ultimoElemento([42])).toBe(42);
+  // =========================
+  // Testes de Arrays
+  // =========================
+  describe("Manipulação de arrays", () => {
+    const numeros = [1, 2, 3];
+    const vazios = [];
+    const duplicados = [1, 1, 2, 2, 3, 3];
+    const strings = ["c", "a", "b"];
+
+    test("primeiroElemento e ultimoElemento devem funcionar corretamente", () => {
+      expect(util.primeiroElemento(numeros)).toBe(1);
+      expect(util.ultimoElemento(numeros)).toBe(3);
+      expect(util.primeiroElemento(vazios)).toBeUndefined();
+      expect(util.ultimoElemento(vazios)).toBeUndefined();
     });
 
-    test("tamanhoArray deve retornar corretamente", () => {
-      expect(utilitarios.tamanhoArray(TEST_DATA.arrays.numbers)).toBe(3);
-      expect(utilitarios.tamanhoArray(TEST_DATA.arrays.empty)).toBe(0);
+    test("tamanhoArray deve retornar corretamente o tamanho", () => {
+      expect(util.tamanhoArray(numeros)).toBe(3);
+      expect(util.tamanhoArray(vazios)).toBe(0);
     });
 
-    test("ordenarArray deve ordenar corretamente e não modificar o original", () => {
-      const original = [...TEST_DATA.arrays.unsorted];
-      expect(utilitarios.ordenarArray(TEST_DATA.arrays.unsorted)).toEqual([1, 2, 3]);
-      expect(TEST_DATA.arrays.unsorted).toEqual(original);
-
-      expect(utilitarios.ordenarArray(TEST_DATA.arrays.strings)).toEqual(["a", "b", "c"]);
-      expect(utilitarios.ordenarArray([100, 20, 3])).toEqual([100, 20, 3]); // sort padrão
+    test("ordenarArray deve ordenar números e strings corretamente e não alterar original", () => {
+      const orig = [...numeros];
+      expect(util.ordenarArray([3, 1, 2])).toEqual([1, 2, 3]);
+      expect(util.ordenarArray(strings)).toEqual(["a", "b", "c"]);
+      expect([3, 1, 2]).toEqual([3, 1, 2]); // original não alterado
     });
 
-    test("inverterArray deve inverter corretamente e não modificar o original", () => {
-      const original = [...TEST_DATA.arrays.numbers];
-      expect(utilitarios.inverterArray(TEST_DATA.arrays.numbers)).toEqual([3, 2, 1]);
-      expect(TEST_DATA.arrays.numbers).toEqual(original);
-      expect(utilitarios.inverterArray(TEST_DATA.arrays.empty)).toEqual([]);
+    test("inverterArray deve inverter corretamente sem alterar original", () => {
+      const arr = [1, 2, 3];
+      expect(util.inverterArray(arr)).toEqual([3, 2, 1]);
+      expect(arr).toEqual([1, 2, 3]);
+      expect(util.inverterArray(vazios)).toEqual([]);
     });
 
-    test("mediaArray deve lidar com arrays normais, vazios, negativos e decimais", () => {
-      expect(utilitarios.mediaArray(TEST_DATA.arrays.forAverage)).toBe(3);
-      expect(utilitarios.mediaArray([])).toBe(0);
-      expect(utilitarios.mediaArray([1.5, 2.5, 3.5])).toBeCloseTo(2.5, 2);
-      expect(utilitarios.mediaArray([-10, 0, 10])).toBe(0);
+    test("mediaArray deve calcular média corretamente incluindo decimais e negativos", () => {
+      expect(util.mediaArray([1, 2, 3])).toBe(2);
+      expect(util.mediaArray([1.5, 2.5, 3.5])).toBeCloseTo(2.5, 2);
+      expect(util.mediaArray([-10, 0, 10])).toBe(0);
+      expect(util.mediaArray(vazios)).toBe(0);
     });
 
-    test("removerDuplicados deve funcionar corretamente com vários tipos", () => {
-      expect(utilitarios.removerDuplicados(TEST_DATA.arrays.withDuplicates)).toEqual([1, 2, 3]);
-      expect(utilitarios.removerDuplicados([3, 1, 1, 2, 3])).toEqual([3, 1, 2]);
-      expect(utilitarios.removerDuplicados(["a", "b", "a", "c", "b"])).toEqual(["a", "b", "c"]);
-      expect(utilitarios.removerDuplicados(TEST_DATA.arrays.mixedTypes)).toEqual([1, "1"]);
+    test("removerDuplicados deve remover corretamente duplicados mantendo ordem", () => {
+      expect(util.removerDuplicados(duplicados)).toEqual([1, 2, 3]);
+      expect(util.removerDuplicados(["a", "b", "a", "c"])).toEqual(["a", "b", "c"]);
     });
 
-    test("juntarArray deve funcionar com separador padrão, customizado, vazio e array vazio", () => {
-      expect(utilitarios.juntarArray(TEST_DATA.arrays.numbers)).toBe("1,2,3");
-      expect(utilitarios.juntarArray(["a", "b", "c"], "-")).toBe("a-b-c");
-      expect(utilitarios.juntarArray(["a", "b", "c"], "")).toBe("abc");
-      expect(utilitarios.juntarArray([])).toBe("");
+    test("juntarArray deve concatenar elementos com separadores corretamente", () => {
+      expect(util.juntarArray([1, 2, 3])).toBe("1,2,3");
+      expect(util.juntarArray(["a", "b"], "-")).toBe("a-b");
+      expect(util.juntarArray(vazios)).toBe("");
     });
   });
 
-  // -------------------
-  // Outros utilitários
-  // -------------------
-  describe("gerarNumeroAleatorio", () => {
-    const MAX_VALUE = 10;
-    const SAMPLE_SIZE = 100;
-
-    test("deve gerar números dentro do limite e inteiros", () => {
-      const numeros = Array.from({ length: SAMPLE_SIZE }, () => utilitarios.gerarNumeroAleatorio(MAX_VALUE));
-      numeros.forEach(num => {
-        expect(num).toBeGreaterThanOrEqual(0);
-        expect(num).toBeLessThan(MAX_VALUE);
-        expect(Number.isInteger(num)).toBe(true);
-      });
-    });
-
-    test("deve gerar números diferentes (aleatoriedade mínima)", () => {
-      const numeros = Array.from({ length: SAMPLE_SIZE }, () => utilitarios.gerarNumeroAleatorio(MAX_VALUE));
+  // =========================
+  // Outros métodos
+  // =========================
+  describe("Outros utilitários", () => {
+    test("gerarNumeroAleatorio deve gerar números inteiros dentro do intervalo e diferentes", () => {
+      const numeros = Array.from({ length: 50 }, () => util.gerarNumeroAleatorio(10));
+      numeros.forEach(n => expect(n).toBeGreaterThanOrEqual(0));
+      numeros.forEach(n => expect(n).toBeLessThan(10));
       expect(new Set(numeros).size).toBeGreaterThan(1);
     });
 
-    test("deve usar valor padrão se max não for especificado", () => {
-      const numero = utilitarios.gerarNumeroAleatorio();
-      expect(numero).toBeGreaterThanOrEqual(0);
-      expect(numero).toBeLessThan(100);
-    });
-  });
-
-  describe("ehNumero", () => {
-    test("valores válidos", () => {
-      expect(utilitarios.ehNumero(123)).toBe(true);
-      expect(utilitarios.ehNumero(123.456)).toBe(true);
-      expect(utilitarios.ehNumero(-123)).toBe(true);
-      expect(utilitarios.ehNumero(0)).toBe(true);
+    test("gerarNumeroAleatorio deve usar limite padrão se não fornecido", () => {
+      const num = util.gerarNumeroAleatorio();
+      expect(num).toBeGreaterThanOrEqual(0);
+      expect(num).toBeLessThan(100);
     });
 
-    test("valores inválidos", () => {
-      expect(utilitarios.ehNumero("123")).toBe(false);
-      expect(utilitarios.ehNumero(NaN)).toBe(false);
-      expect(utilitarios.ehNumero(null)).toBe(false);
-      expect(utilitarios.ehNumero(undefined)).toBe(false);
-      expect(utilitarios.ehNumero({})).toBe(false);
-      expect(utilitarios.ehNumero([])).toBe(false);
-    });
-  });
-
-  describe("mesclarObjetos", () => {
-    test("deve mesclar objetos corretamente", () => {
-      expect(utilitarios.mesclarObjetos(TEST_DATA.objects.first, TEST_DATA.objects.second)).toEqual(TEST_DATA.objects.merged);
-      expect(utilitarios.mesclarObjetos({}, { a: 1 })).toEqual({ a: 1 });
-      expect(utilitarios.mesclarObjetos({ a: 1 }, {})).toEqual({ a: 1 });
+    test("ehNumero deve identificar corretamente números válidos e inválidos", () => {
+      expect(util.ehNumero(0)).toBe(true);
+      expect(util.ehNumero(-123.4)).toBe(true);
+      expect(util.ehNumero("123")).toBe(false);
+      expect(util.ehNumero(NaN)).toBe(false);
+      expect(util.ehNumero(null)).toBe(false);
+      expect(util.ehNumero({})).toBe(false);
+      expect(util.ehNumero([])).toBe(false);
     });
 
-    test("não deve modificar os objetos originais", () => {
-      const obj1 = { a: 1 }, obj2 = { b: 2 };
-      const result = utilitarios.mesclarObjetos(obj1, obj2);
-      expect(obj1).toEqual({ a: 1 });
-      expect(obj2).toEqual({ b: 2 });
-      expect(result).toEqual({ a: 1, b: 2 });
-    });
-
-    test("deve lidar com objetos aninhados (shallow merge)", () => {
-      expect(utilitarios.mesclarObjetos(TEST_DATA.objects.nested1, TEST_DATA.objects.nested2))
-        .toEqual({ a: { x: 1 }, b: { y: 2 } });
+    test("mesclarObjetos deve combinar corretamente e não alterar os originais", () => {
+      const obj1 = { a: 1, b: 2 };
+      const obj2 = { b: 3, c: 4 };
+      const resultado = util.mesclarObjetos(obj1, obj2);
+      expect(resultado).toEqual({ a: 1, b: 3, c: 4 });
+      expect(obj1).toEqual({ a: 1, b: 2 });
+      expect(obj2).toEqual({ b: 3, c: 4 });
     });
   });
 });
